@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>実験</title>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
+    <script src="jspsych-psychophysics.js"></script>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.1"></script>
+    <link
+      href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <style>
+      body {
+        background-color: black;
+        color: white;
+      }
+      .jspsych-display-element {
+        background-color: black;
+        color: white;
+      }
+    </style>
+  </head>
+  <body></body>
+  <script>
+    /* initialize jsPsych */
+    var jsPsych = initJsPsych({
+      on_finish: function () {
+        window.location = "https://www.agu.ac.jp/";
+      },
+    });
+
+    const subject_id = jsPsych.randomization.randomID(10);
+    const filename = `${subject_id}.csv`;
+
+    /* create timeline */
+    var timeline = [];
+
+    /* define trial stimuli array for timeline variables */
+    const factors = {
+      trial: ["valid", "invalid"],
+      pos_target: [200, 600],
+      SOA: [0, 100, 200, 300, 500],
+    };
+    const full_design = jsPsych.randomization.factorial(factors);
+
+    for (let i = 0; i < full_design.length; i++) {
+      if (full_design[i].trial == "valid") {
+        full_design[i].pos_cueing = full_design[i].pos_target;
+      } else {
+        if (full_design[i].pos_target == 200) {
+          full_design[i].pos_cueing = 600;
+        } else {
+          full_design[i].pos_cueing = 200;
+        }
+      }
+
+      full_design[i].start_time_target = full_design[i].SOA + 1050;
+      if (full_design[i].pos_target == 200) {
+        full_design[i].correct_response = "f";
+      } else {
+        full_design[i].correct_response = "j";
+      }
+    }
+    console.log(full_design);
+
+    /* define welcome message trial */
+    const consent = {
+
+    };
+
+    const enter_fullscreen = {
+      type: jsPsychFullscreen,
+      message: `
+        <p>実験の参加ページへようこそ。<br>以下の注意事項を読み，実験に協力いただける場合には，「実験への参加に同意する」ボタンを押して実験にご参加ください。</p>
+        <div style='width: 800px; margin-right: auto; margin-left: auto;'>
+        <ul style='text-align: left;'>
+          <li>この実験は，人間の空間的注意を検討するために実施します。実験の所要時間は個人差がありますが5分程度です。</li>
+          <li>この実験への参加は強制されるものではありません。途中でやめたくなった場合はブラウザを閉じて回答を中⽌することができます。回答を中止した場合でもあなたが不利益を受けることはありません。実験へ協力するか否かはあなたの意思で自由に決めることができます。</li>
+          <li>回答データは無記名で記録をし，個人を特定する情報が公になることは一切ありません。データは実験終了後すぐに，オープンデータとしてデータ公開用サイトに公開されます。このデータは主に教育目的で利用されます。</li>
+          <li>この実験はフルスクリーンモードで行います。「同意する」ボタンを押すとフルスクリーンモードに変わります。（途中で実験をやめたいときには，Escキーで解除できます。）
+        </ul>
+        </div>
+        `,
+      button_label: "実験への参加に同意する",
+      fullscreen_mode: true,
+    };
+    timeline.push(enter_fullscreen);
+
+    /* define instructions trial */
+    var instructions = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <p>この実験では注視点（＋）を挟んだ左右の2つのボックスのいずれかに，白い円が呈示されます。</p>
+        <p>左の四角に円が呈示されたら「<strong>F</strong>」キーを押してください。</p>
+        <p>右の四角に円が呈示されたら「<strong>J</strong>」キーを押してください。</p>
+        <p>円が呈示される前に左右のボックスのいずれかが光りますが，円の呈示される位置とは関係ありません。</p>
+        <p>キーを押した後は，注視点を見るようにしてください。</p>
+        <p>何かキーを押すと実験が始まります。</p>
+      `,
+      post_trial_gap: 2000,
+    };
+    timeline.push(instructions);
+
+    /* define rectangles */
+    const rectangles = [];
+
+    for (let i = 0; i < 2; i++) {
+      let rect = {
+        obj_type: "rect",
+        startX: 200 + 400 * i,
+        startY: 300,
+        width: 100,
+        height: 100,
+        line_color: "#ffffff",
+        fill_color: "#000000",
+        show_start_time: 0,
+      };
+      rectangles.push(rect);
+    }
+
+    const fixation = {
+      obj_type: "cross",
+      startX: 400,
+      startY: 300,
+      line_length: 30,
+      line_width: 5,
+      line_color: "#ffffff",
+    };
+
+    const cueing = {
+      obj_type: "rect",
+      startX: jsPsych.timelineVariable("pos_cueing"),
+      startY: 300,
+      width: 100,
+      height: 100,
+      line_width: 5,
+      line_color: "#ffffff",
+      fill_color: "#000000",
+      show_start_time: 1000,
+      show_end_time: 1050,
+    };
+
+    const target = {
+      obj_type: "circle",
+      startX: jsPsych.timelineVariable("pos_target"), // location in the canvas
+      startY: 300,
+      radius: 30,
+      line_color: "#ffffff", // You can use the HTML color name instead of the HEX color.
+      fill_color: "#ffffff",
+      show_start_time: jsPsych.timelineVariable("start_time_target"),
+    };
+
+    const stimuli = rectangles.concat([fixation, cueing, target]);
+
+    const trial = {
+      type: jsPsychPsychophysics,
+      timeline: [
+        {
+          type: jsPsychPsychophysics,
+          stimuli: stimuli,
+          choices: ["f", "j"],
+          canvas_width: 800,
+          canvas_height: 600,
+          background_color: "#000000",
+          response_start_time: jsPsych.timelineVariable("start_time_target"),
+          data: {
+            task: "response",
+            trial: jsPsych.timelineVariable("trial"),
+            SOA: jsPsych.timelineVariable("SOA"),
+            target: jsPsych.timelineVariable("pos_target"),
+            correct_response: jsPsych.timelineVariable("correct_response"),
+          },
+          on_finish: function (data) {
+            data.correct = jsPsych.pluginAPI.compareKeys(
+              data.response,
+              data.correct_response
+            );
+          },
+        },
+      ],
+      timeline_variables: full_design,
+      randomize_order: true,
+      repetitions: 4,
+    };
+
+    timeline.push(trial);
+
+    /* define debrief */
+    const debrief = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function () {
+        const trials = jsPsych.data.get().filter({ task: "response" });
+        const correct_trials = trials.filter({ correct: true });
+        const accuracy = Math.round(
+          (correct_trials.count() / trials.count()) * 100
+        );
+        const rt = Math.round(correct_trials.select("rt").mean());
+
+        return `
+        <p>あなたの正答率は${accuracy}%でした。</p>
+        <p>あなたの平均反応時間は${rt}ミリ秒でした。</p>
+        <p>いずれかキーを押すとフルスクリーンモードを解除し実験を終了します。</p>
+        <p>実験へのご参加ありがとうございました。
+        <br>（終了後は愛知学院大学のトップページに移動しますので，移動後にブラウザを閉じてください。）</p>`;
+      },
+    };
+    timeline.push(debrief);
+
+    const exit_fullscreen = {
+      type: jsPsychFullscreen,
+      delay_after: 0,
+      fullscreen_mode: false,
+    };
+    timeline.push(exit_fullscreen);
+
+    const save_data = {
+      type: jsPsychPipe,
+      action: "save",
+      experiment_id: "yiAiOw49jFnL",
+      filename: filename,
+      data_string: () => jsPsych.data.get().csv(),
+    };
+    timeline.push(save_data);
+
+    /* start the experiment */
+    jsPsych.run(timeline);
+  </script>
+</html>
