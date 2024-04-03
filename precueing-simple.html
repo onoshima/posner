@@ -33,8 +33,10 @@
       },
     });
 
-    const subject_id = jsPsych.randomization.randomID(10);
-    const filename = `${subject_id}.csv`;
+    const participant_id = jsPsych.randomization.randomID(10);
+    const filename = `${participant_id}.csv`;
+
+    jsPsych.data.addProperties({participant_id: participant_id});
 
     /* create timeline */
     var timeline = [];
@@ -42,27 +44,32 @@
     /* define trial stimuli array for timeline variables */
     const factors = {
       trial: ["valid", "invalid"],
-      pos_target: [200, 600],
+      pos_target: ["left", "right"],
       SOA: [0, 50, 100, 200, 300, 500],
     };
     const full_design = jsPsych.randomization.factorial(factors);
 
     for (let i = 0; i < full_design.length; i++) {
-      if (full_design[i].trial == "valid") {
-        full_design[i].pos_cueing = full_design[i].pos_target;
+      if (full_design[i].pos_target == "right") {
+        full_design[i].pos_target_xy = 650;
       } else {
-        if (full_design[i].pos_target == 200) {
-          full_design[i].pos_cueing = 600;
+        full_design[i].pos_target_xy = 150;
+      }
+      if (full_design[i].trial == "valid") {
+        full_design[i].pos_cueing = full_design[i].pos_target_xy;
+      } else {
+        if (full_design[i].pos_target == "right") {
+          full_design[i].pos_cueing = 150;
         } else {
-          full_design[i].pos_cueing = 200;
+          full_design[i].pos_cueing = 650;
         }
       }
 
       full_design[i].start_time_target = full_design[i].SOA + 1050;
-      if (full_design[i].pos_target == 200) {
-        full_design[i].correct_response = "f";
-      } else {
+      if (full_design[i].pos_target == "right") {
         full_design[i].correct_response = "j";
+      } else {
+        full_design[i].correct_response = "f";
       }
     }
     console.log(full_design);
@@ -81,7 +88,7 @@
           <li>この実験は，人間の空間的注意を検討するために実施します。実験の所要時間は個人差がありますが3分から5分程度です。</li>
           <li>この実験でお願いしたいことは，画面上に出てくる図形を見て決められたキーボードのボタンを押すことです。</li>
           <li>この実験への参加は強制されるものではありません。途中でやめたくなった場合はブラウザを閉じて回答を中⽌することができます。回答を中止した場合でもあなたが不利益を受けることはありません。実験へ協力するか否かはあなたの意思で自由に決めることができます。</li>
-          <li>回答データは無記名で記録し，個人を特定する情報が公になることは一切ありません。データは実験終了後すぐに，オープンデータとしてデータ公開用サイト（https://osf.io/）に公開されます。このデータは主に教育目的で利用されます。</li>
+          <li>回答データは無記名で記録し，個人を特定する情報が公になることは一切ありません。データは実験終了後にオープンデータとしてデータ公開用サイト（https://osf.io/）に公開されます。このデータは主に教育目的で利用されます。</li>
           <li>この実験はフルスクリーンモードで行います。「実験への参加に同意する」ボタンを押すとフルスクリーンモードに変わります。（途中で実験をやめたいときには，Escキーで解除できます。）
         </ul>
         </div>
@@ -118,7 +125,7 @@
     for (let i = 0; i < 2; i++) {
       let rect = {
         obj_type: "rect",
-        startX: 200 + 400 * i,
+        startX: 150 + 500 * i,
         startY: 300,
         width: 100,
         height: 100,
@@ -153,7 +160,7 @@
 
     const target = {
       obj_type: "circle",
-      startX: jsPsych.timelineVariable("pos_target"), // location in the canvas
+      startX: jsPsych.timelineVariable("pos_target_xy"), // location in the canvas
       startY: 300,
       radius: 30,
       line_color: "#ffffff", // You can use the HTML color name instead of the HEX color.
@@ -209,7 +216,7 @@
 
         return `
         <p>あなたの正答率は${accuracy}%でした。</p>
-        <p>あなたの平均反応時間は${rt}ミリ秒でした。</p>
+        <p>あなたの正答試行における平均反応時間は${rt}ミリ秒でした。</p>
         <p>いずれかキーを押すとフルスクリーンモードを解除し実験を終了します。</p>
         <p>実験へのご参加ありがとうございました。
         <br>（終了後は愛知学院大学のトップページに移動しますので，移動後にブラウザを閉じてください。）</p>`;
