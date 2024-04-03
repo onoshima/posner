@@ -45,18 +45,18 @@
     const factors = {
       trial: ["valid", "invalid"],
       pos_target: ["left", "right"],
-      SOA: [0, 50, 100, 200, 300, 500],
+      SOA: [0, 50, 100, 200, 300, 500]
     };
     const full_design = jsPsych.randomization.factorial(factors);
 
     for (let i = 0; i < full_design.length; i++) {
       if (full_design[i].pos_target == "right") {
-        full_design[i].pos_target_xy = 650;
+        full_design[i].pos_target_x = 650;
       } else {
-        full_design[i].pos_target_xy = 150;
+        full_design[i].pos_target_x = 150;
       }
       if (full_design[i].trial == "valid") {
-        full_design[i].pos_cueing = full_design[i].pos_target_xy;
+        full_design[i].pos_cueing = full_design[i].pos_target_x;
       } else {
         if (full_design[i].pos_target == "right") {
           full_design[i].pos_cueing = 150;
@@ -160,7 +160,7 @@
 
     const target = {
       obj_type: "circle",
-      startX: jsPsych.timelineVariable("pos_target_xy"), // location in the canvas
+      startX: jsPsych.timelineVariable("pos_target_x"), // location in the canvas
       startY: 300,
       radius: 30,
       line_color: "#ffffff", // You can use the HTML color name instead of the HEX color.
