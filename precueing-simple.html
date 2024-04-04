@@ -102,18 +102,19 @@
     var instructions = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <p>この実験では注視点（＋）を挟んだ左右の2つのボックスのいずれかに，白い円が呈示されます。</p>
-        <p>左のボックスに円が呈示されたら「<strong>F</strong>」キーを押してください。</p>
-        <p>右のボックスに円が呈示されたら「<strong>J</strong>」キーを押してください。</p>
-        <p>円が呈示される前に左右のボックスのいずれかが光りますが，円が呈示される位置とは関係ありません。</p>
-        <p>キーを押した後は，注視点を見るようにしてください。</p>
-        <div style='width: 800px;'>
+      <p>この実験では注視点（＋）を挟んで左右に2つのボックスが表示されます。<br>
+         実験中は注視点（＋）から目を動かさないようにしてください。</p>
+      <p>左右の2つのボックスのいずれかに，白い円が呈示されます。</p>
+      <p>左のボックスに円が呈示されたら「<strong>F</strong>」キーを押してください。<br>
+         右のボックスに円が呈示されたら「<strong>J</strong>」キーを押してください。</p>
+      <p>円が呈示される前に左右のボックスのいずれかが光りますが，円が呈示される位置とは関係ありません。</p>
+      <div style='width: 800px;'>
           <div style='float: left;  margin: 0 50px 0 0;'><img src='img/left.png' width='350'></img>
           <p class='small'><strong>Fキー</strong>を押す</p></div>
           <div style='float: right; margin: 0 0 0 50px ;'><img src='img/right.png' width='350'></img>
           <p class='small'><strong>Jキー</strong>を押す</p></div>
-        </div></br>
-        <p>何かキーを押すと実験が始まります。</p>
+      </div></br>
+      <p>何かキーを押すと実験が始まります。</p>
       `,
       post_trial_gap: 2000,
     };
